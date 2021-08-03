@@ -180,10 +180,10 @@ def servicenow(certname, config_file = nil)
   cmdb_record = JSON.parse(body)['result'][0] || {}
   parse_classification_fields(cmdb_record, classes_field, environment_field)
 
-  response = {
-    # servicenow: cmdb_record,
-    cmdb_record
-  }.to_json
+  # response = {
+  #   servicenow: cmdb_record,
+  # }.to_json
+  response = cmdb_record.to_json
 
   response
 end
