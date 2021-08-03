@@ -24,15 +24,19 @@
 # @param [String] environment_field
 #   The column name of the CMDB field that stores the node's environment. Defaults
 #   to 'u_puppet_environment'.
+# @param [String] external_commands_base
+#   The directory to store and run trusted external commands. Defaults to 
+#   '/etc/puppetlabs/puppet/trusted-external-commands'.
 class servicenow_cmdb_integration (
   String $instance,
-  Optional[String] $user        = undef,
-  Optional[String] $password    = undef,
-  Optional[String] $oauth_token = undef,
-  String $table                 = 'cmdb_ci',
-  String $certname_field        = 'fqdn',
-  String $classes_field         = 'u_puppet_classes',
-  String $environment_field     = 'u_puppet_environment',
+  Optional[String] $user         = undef,
+  Optional[String] $password     = undef,
+  Optional[String] $oauth_token  = undef,
+  String $table                  = 'cmdb_ci',
+  String $certname_field         = 'fqdn',
+  String $classes_field          = 'u_puppet_classes',
+  String $environment_field      = 'u_puppet_environment',
+  String $external_commands_base = '/etc/puppetlabs/puppet/trusted-external-commands',
 ) {
 
   if (($user or $password) and $oauth_token) {
@@ -54,7 +58,6 @@ class servicenow_cmdb_integration (
   # Warning: These values are parameterized here at the top of this file, but the
   # path to the yaml file is hard coded in the servicenow.rb script.
   $puppet_base = '/etc/puppetlabs/puppet'
-  $external_commands_base = "${puppet_base}/trusted-external-commands"
   $validate_settings_path = '/tmp/validate_settings.rb'
 
   $resource_dependencies = flatten([
@@ -107,7 +110,7 @@ class servicenow_cmdb_integration (
     ensure  => present,
     path    => '/etc/puppetlabs/puppet/puppet.conf',
     setting => 'trusted_external_command',
-    value   => "${external_commands_base}/servicenow.rb",
+    value   => $external_commands_base,
     section => 'master',
     notify  => Service['pe-puppetserver'],
     require => $resource_dependencies,
